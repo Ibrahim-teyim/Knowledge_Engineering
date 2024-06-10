@@ -1,6 +1,4 @@
-import re
 import requests
-import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials

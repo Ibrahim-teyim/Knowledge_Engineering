@@ -1,0 +1,6 @@
+requests
+spotipy
+scikit-learn
+rdflib
+pandas
+numpy
