@@ -8,27 +8,36 @@ class NewsProcessor:
     def __init__(self, subjects=None):
         self.subjects = subjects
 
-    def process_headlines(self, headlines):
+    def process_headlines(self, news_df, headlines):
         lowered_subjects = [subject.lower() for subject in self.subjects]
         lowered_headlines = [headline.lower() for headline in headlines]
-        subject_counts = Counter()
-        for headline in lowered_headlines:
-            for subject in lowered_subjects:
-                if subject in headline:
-                    subject_counts[subject] += 1
-        return subject_counts
+        # subject_counts = Counter()
+        subjects_column = []
+        subject_counts_column = []
 
-    def normalize_mentions(self, subject_counts):
-        subject_counts_df = pd.DataFrame(
-            subject_counts.items(), columns=["Subject", "Mentions"]
-        )
-        subject_counts_df = subject_counts_df[subject_counts_df["Subject"] != "dev"]
-        subject_counts_df["Mentions"] = np.log1p(subject_counts_df["Mentions"])
+        for headline in lowered_headlines:
+            subjects_in_headline = []
+            headline_subject_count = 0
+            # Split the headline into words
+            words_in_headline = headline.split()
+            for subject in lowered_subjects:
+                # Check if the subject is in the list of words
+                if subject in words_in_headline:
+                    subjects_in_headline.append(subject)
+                    headline_subject_count += 1
+            subjects_column.append(subjects_in_headline)
+            subject_counts_column.append(headline_subject_count)
+
+        news_df["Subjects"] = subjects_column
+        news_df["Mentions"] = subject_counts_column
+
+        return news_df
+
+    def normalize_mentions(self, news_df):
+        news_df["Ratings"] = np.log1p(news_df["Mentions"])
         scaler = MinMaxScaler(feature_range=(1, 10))
-        subject_counts_df["Ratings"] = scaler.fit_transform(
-            subject_counts_df[["Mentions"]]
-        )
-        return subject_counts_df
+        news_df["Ratings"] = scaler.fit_transform(news_df[["Mentions"]])
+        return news_df
 
     def get_news(self, news_df):
         return news_df

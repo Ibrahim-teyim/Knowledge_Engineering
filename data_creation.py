@@ -21,10 +21,7 @@ def create_data():
     music_df = loader.load_csv("spotify.csv")
 
     subjects = extract_subjects(tv_df, actor_profit_df, actor_rating_df, music_df)
-    # process_news(loader, news_df, subjects)
-
-    # Get news
-    get_news(loader, news_df)
+    process_news(loader, news_df, subjects)
 
     # Process actor ratings
     process_actor_ratings(loader, actor_rating_df)
@@ -69,9 +66,11 @@ def extract_subjects(tv_df, actor_profit_df, actor_rating_df, music_df):
 
 def process_news(loader, news_df, subjects):
     news_processor = NewsProcessor(subjects)
-    subject_counts = news_processor.process_headlines(news_df["headline_text"])
-    subject_counts_df = news_processor.normalize_mentions(subject_counts)
-    loader.save_csv(subject_counts_df, DATASET_PREFIX + "news_subject_ratings.csv")
+    news_df = news_processor.process_headlines(
+        news_df=news_df, headlines=news_df["headline_text"]
+    )
+    subject_counts_df = news_processor.normalize_mentions(news_df)
+    loader.save_csv(subject_counts_df, "news.csv")
 
 
 def get_news(loader, news_df):
