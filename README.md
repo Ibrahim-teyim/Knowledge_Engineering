@@ -4,6 +4,7 @@
 
 The datasets should be in the following file format:
 
+```
 Knowledge_Engineering/
 ├─ datasets/
 │  ├─ actor_profit.csv
@@ -17,6 +18,7 @@ Knowledge_Engineering/
 │  ├─ news.csv
 │  ├─ tv.csv
 │  ├─ spotify.csv
+```
 
 
 Where, **to_edit_datasets/** is used for storing the pure data and **datasets** contain the pre-processed and edited data. 
