@@ -11,18 +11,15 @@ class NewsProcessor:
     def process_headlines(self, news_df, headlines):
         lowered_subjects = [subject.lower() for subject in self.subjects]
         lowered_headlines = [headline.lower() for headline in headlines]
-        # subject_counts = Counter()
         subjects_column = []
         subject_counts_column = []
 
         for headline in lowered_headlines:
             subjects_in_headline = []
             headline_subject_count = 0
-            # Split the headline into words
-            words_in_headline = headline.split()
             for subject in lowered_subjects:
-                # Check if the subject is in the list of words
-                if subject in words_in_headline:
+                # Check if the subject is in the headline
+                if subject in headline:
                     subjects_in_headline.append(subject)
                     headline_subject_count += 1
             subjects_column.append(subjects_in_headline)

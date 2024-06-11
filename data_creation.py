@@ -1,4 +1,5 @@
 from data_processing.data_loader import DataLoader
+from data_processing.date_formatter import DateFormatter
 from data_processing.music_release_date_fetcher import ReleaseDateFetcher
 from data_processing.news_processor import NewsProcessor
 from data_processing.rating_processor import RatingsProcessor
@@ -34,6 +35,8 @@ def create_data():
 
     # Get release dates and process music popularity
     process_music_popularity(loader, process_release_dates(loader, music_df))
+
+    format_dates()
 
 
 def process_release_dates(loader, df):
@@ -97,6 +100,25 @@ def process_tv_shows(loader, tv_df):
 def process_music_popularity(loader, music_df):
     music_popularity_df = RatingsProcessor.process_music_popularity(music_df)
     loader.save_csv(music_popularity_df, "music_popularity.csv")
+
+
+def format_dates():
+    # Load updated files
+    loader = DataLoader(DATASET_PREFIX, DATASET_PREFIX)
+    actor_profit_df = loader.load_csv("actor_profit.csv")
+    news_df = loader.load_csv("news.csv")
+    music_df = loader.load_csv("music_popularity.csv")
+    tv_df = loader.load_csv("tv.csv")
+
+    formatter = DateFormatter()
+    actor_profit_df = formatter.format_actor_profit(actor_profit_df)
+    news_df = formatter.format_news(news_df)
+    music_df = formatter.format_music_popularity(music_df)
+    tv_df = formatter.format_tv(tv_df)
+    loader.save_csv(actor_profit_df, "actor_profit.csv")
+    loader.save_csv(news_df, "news.csv")
+    loader.save_csv(music_df, "music_popularity.csv")
+    loader.save_csv(tv_df, "tv.csv")
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+import ast
 import pandas as pd
 from rdflib import Graph, Literal, RDF, URIRef
 from rdflib.namespace import FOAF, XSD, Namespace
@@ -102,6 +103,13 @@ class KnowledgeGraphCreator:
                         Literal(row["Ratings"], datatype=XSD.float),
                     )
                 )
+                self.g.add(
+                    (
+                        film_uri,
+                        self.EX.release_date,
+                        Literal(row["Release Date"], datatype=XSD.date),
+                    )
+                )
                 self.g.add((actor_uri, self.EX.acted_in, film_uri))
         print("Films added to the graph")
 
@@ -195,7 +203,7 @@ class KnowledgeGraphCreator:
                         (
                             tv_show_uri,
                             self.EX.release_date,
-                            Literal(row["Release Date"], datatype=XSD.string),
+                            Literal(row["Release Date"], datatype=XSD.date),
                         )
                     )
                     self.g.add(
@@ -252,7 +260,7 @@ class KnowledgeGraphCreator:
                 (
                     music_uri,
                     self.EX.release_date,
-                    Literal(row["Release Date"], datatype=XSD.string),
+                    Literal(row["Release Date"], datatype=XSD.date),
                 )
             )
             self.g.add(
@@ -266,11 +274,64 @@ class KnowledgeGraphCreator:
 
         print("Music added to the graph")
 
+    def add_news_to_graph(self):
+        for index, row in self.news.iterrows():
+            if pd.notnull(row).all():
+                headline_text = urllib.parse.quote(
+                    str(row["headline_text"]).replace(" ", "_"), safe="/:"
+                )
+                news_uri = URIRef(self.EX[headline_text])
+                self.g.add((news_uri, RDF.type, self.EX.News))
+                self.g.add(
+                    (
+                        news_uri,
+                        self.EX.publish_date,
+                        Literal(row["publish_date"], datatype=XSD.date),
+                    )
+                )
+                self.g.add(
+                    (
+                        news_uri,
+                        self.EX.headline_category,
+                        Literal(row["headline_category"], datatype=XSD.string),
+                    )
+                )
+                self.g.add(
+                    (
+                        news_uri,
+                        self.EX.headline_text,
+                        Literal(row["headline_text"], datatype=XSD.string),
+                    )
+                )
+                # Parse the Subjects string
+                subjects = ast.literal_eval(row["Subjects"])
+                for subject in subjects:
+                    subject_uri = URIRef(self.EX[subject.replace(" ", "_")])
+                    self.g.add((news_uri, self.EX.subject, subject_uri))
+                    self.g.add((subject_uri, self.EX.mentioned, news_uri))
+
+                self.g.add(
+                    (
+                        news_uri,
+                        self.EX.mentions,
+                        Literal(row["Mentions"], datatype=XSD.integer),
+                    )
+                )
+                self.g.add(
+                    (
+                        news_uri,
+                        self.EX.ratings,
+                        Literal(row["Ratings"], datatype=XSD.float),
+                    )
+                )
+        print("News articles added to the graph")
+
     def create_graph(self):
         self.add_actors_to_graph()
         self.add_films_to_graph()
         self.add_tv_shows_to_graph()
         self.add_music_to_graph()
+        self.add_news_to_graph()
         print("Graph created successfully!")
 
     def save_graph(self, file_name="knowledge_graph.ttl"):
@@ -289,46 +350,3 @@ if __name__ == "__main__":
     kg_creator = KnowledgeGraphCreator(prefix)
     kg_creator.create_graph()
     kg_creator.save_graph()
-
-    query1 = """
-    PREFIX ex: <>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-
-    SELECT ?entity ?type ?rating
-    WHERE {
-        ?entity rdf:type ?type .
-        ?entity ex:rating ?rating .
-    }
-    ORDER BY DESC(?rating)
-    LIMIT 10
-    """
-
-    query2 = """
-    PREFIX ex: <>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-
-    SELECT ?actor
-    WHERE {
-        ?actor ex:acted_in <Kota_Factory> .
-    }
-    """
-
-    query3 = """
-    PREFIX ex: <>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-
-    SELECT ?entity ?show_uri
-    WHERE {
-        ?entity ex:acted_in ?show_uri .
-    }
-    """
-
-    print("Top 10 entities with highest ratings:")
-    kg_creator.query_graph(query1, "entity", "type", "rating")
-    # kg_creator.query_graph(query2, "actor", "film")
-    # kg_creator.query_graph(query3, "entity", "show_uri")
-    print()
-    print("Actors who acted in Kota Factory:")
-    for row in kg_creator.g.query(query2):
-        print(row.actor)

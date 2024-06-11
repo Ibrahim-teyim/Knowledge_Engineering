@@ -165,8 +165,8 @@ cython_debug/
 graph_creation_boilerplate.py
 
 # Vscode
-.vscode/
+.vscode/*
 
 # Dataset
-dataset/
-to_edit_dataset/
+dataset/*
+to_edit_dataset/*
