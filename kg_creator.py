@@ -320,6 +320,13 @@ class KnowledgeGraphCreator:
                 self.g.add(
                     (
                         news_uri,
+                        self.EX.sentiment,
+                        Literal(row["Sentiment"], datatype=XSD.string),
+                    )
+                )
+                self.g.add(
+                    (
+                        news_uri,
                         self.EX.ratings,
                         Literal(row["Ratings"], datatype=XSD.float),
                     )

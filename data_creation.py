@@ -22,7 +22,7 @@ def create_data():
     music_df = loader.load_csv("spotify.csv")
 
     subjects = extract_subjects(tv_df, actor_profit_df, actor_rating_df, music_df)
-    process_news(loader, news_df, subjects)
+    process_news(loader, remove_duplicates(news_df), subjects)
 
     # Process actor ratings
     process_actor_ratings(loader, actor_rating_df)
@@ -34,12 +34,12 @@ def create_data():
     process_tv_shows(loader, tv_df)
 
     # Get release dates and process music popularity
-    process_music_popularity(loader, process_release_dates(loader, music_df))
+    process_music_popularity(loader, process_release_dates(music_df))
 
     format_dates()
 
 
-def process_release_dates(loader, df):
+def process_release_dates(df):
     fetcher = ReleaseDateFetcher(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET)
     df["Normalized Name"] = (
         df["Name"].str.replace(r"\(.*\)", "", regex=True).str.strip()
@@ -59,6 +59,8 @@ def extract_subjects(tv_df, actor_profit_df, actor_rating_df, music_df):
             .str.split(", ")
             .explode()
             .dropna()
+            .apply(lambda x: x.strip())
+            .loc[lambda x: x != ""]
             .tolist()
             + actor_profit_df["Actor_name"].tolist()
             + actor_rating_df["actorName"].tolist()
@@ -74,12 +76,6 @@ def process_news(loader, news_df, subjects):
     )
     subject_counts_df = news_processor.normalize_mentions(news_df)
     loader.save_csv(subject_counts_df, "news.csv")
-
-
-def get_news(loader, news_df):
-    news_processor = NewsProcessor()
-    news_df = news_processor.get_news(news_df)
-    loader.save_csv(news_df, "news.csv")
 
 
 def process_actor_ratings(loader, actor_rating_df):
@@ -100,6 +96,11 @@ def process_tv_shows(loader, tv_df):
 def process_music_popularity(loader, music_df):
     music_popularity_df = RatingsProcessor.process_music_popularity(music_df)
     loader.save_csv(music_popularity_df, "music_popularity.csv")
+
+
+def remove_duplicates(df):
+    df = df.drop_duplicates(subset=["headline_text"])
+    return df
 
 
 def format_dates():

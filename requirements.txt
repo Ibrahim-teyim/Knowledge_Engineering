@@ -4,3 +4,4 @@ scikit-learn
 rdflib
 pandas
 numpy
+textblob

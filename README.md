@@ -22,11 +22,11 @@ pip3 install -r requirements.txt
 ```
 
 
-## Naming protocol of the datasets:
+## Naming protocol of the datasets
 
 The datasets should be in the following file format:
 
-```
+```markdown
 Knowledge_Engineering/
 ├─ datasets/
 │  ├─ actor_profit.csv
@@ -42,5 +42,13 @@ Knowledge_Engineering/
 │  ├─ spotify.csv
 ```
 
+Where, **to_edit_datasets/** is used for storing the pure data and **datasets** contain the pre-processed and edited data. The pure data can be accessed using the links below:
+* [actor_profit.csv](https://www.kaggle.com/datasets/anweshasaha/bollywood-actors-2010s)
+* [actor_ratings.csv](https://www.kaggle.com/datasets/mitesh58/bollywood-movie-dataset)
+* [news.csv](https://www.kaggle.com/datasets/therohk/india-headlines-news-dataset)
+* [tv.csv](https://www.kaggle.com/datasets/shubhamzorc9/-imdbtop-indian-tv-shows)
+* [spotify.csv](https://www.kaggle.com/datasets/kanchana1990/popular-spotify-hindi-hits-top-1000)
 
-Where, **to_edit_datasets/** is used for storing the pure data and **datasets** contain the pre-processed and edited data. 
+## Querying the created KG using Blazergraph
+
+Follow [this guide](https://github.com/blazegraph/database/wiki/Quick_Start) to query the graph. `blazergraph.jar` is present in the repo.

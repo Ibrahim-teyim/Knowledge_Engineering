@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from collections import Counter
 from sklearn.preprocessing import MinMaxScaler
+from textblob import TextBlob as tb
 
 
 class NewsProcessor:
@@ -28,12 +29,24 @@ class NewsProcessor:
         news_df["Subjects"] = subjects_column
         news_df["Mentions"] = subject_counts_column
 
-        return news_df
+        return self.extract_semantics(news_df, headlines)
 
     def normalize_mentions(self, news_df):
         news_df["Ratings"] = np.log1p(news_df["Mentions"])
         scaler = MinMaxScaler(feature_range=(1, 10))
         news_df["Ratings"] = scaler.fit_transform(news_df[["Mentions"]])
+        return news_df
+
+    def extract_semantics(self, news_df, headlines):
+        news_df["Sentiment"] = [
+            (
+                "positive"
+                if tb(headline).sentiment.polarity > 0
+                else ("negative" if tb(headline).sentiment.polarity < 0 else "neutral")
+            )
+            for headline in headlines
+        ]
+
         return news_df
 
     def get_news(self, news_df):
