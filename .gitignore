@@ -170,3 +170,7 @@ graph_creation_boilerplate.py
 # Dataset
 dataset/*
 to_edit_dataset/*
+
+# Extra files
+blazergraph.jnl
+knowledge_graph.ttl

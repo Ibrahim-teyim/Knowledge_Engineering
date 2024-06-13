@@ -9,7 +9,10 @@ class NewsProcessor:
     def __init__(self, subjects=None):
         self.subjects = subjects
 
-    def process_headlines(self, news_df, headlines):
+    def process_headlines(self, news_df):
+        news_df = self.filter_by_date(news_df)
+        headlines = news_df["headline_text"]
+
         lowered_subjects = [subject.lower() for subject in self.subjects]
         lowered_headlines = [headline.lower() for headline in headlines]
         subjects_column = []
@@ -49,5 +52,11 @@ class NewsProcessor:
 
         return news_df
 
-    def get_news(self, news_df):
-        return news_df
+    def filter_by_date(self, news_df, year=2015):
+        # Convert 'publish_date' from integer to datetime format
+        news_df["publish_date"] = pd.to_datetime(
+            news_df["publish_date"].astype(str), format="%Y%m%d"
+        )
+        # Apply the filter based on the year
+        mask = news_df["publish_date"].dt.year > year
+        return news_df.loc[mask]

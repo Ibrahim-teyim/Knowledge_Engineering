@@ -21,22 +21,24 @@ def create_data():
     actor_rating_df = loader.load_csv("actor_ratings.csv")
     music_df = loader.load_csv("spotify.csv")
 
-    subjects = extract_subjects(tv_df, actor_profit_df, actor_rating_df, music_df)
-    process_news(loader, remove_duplicates(news_df), subjects)
-
     # Process actor ratings
-    process_actor_ratings(loader, actor_rating_df)
+    actor_rating_df = process_actor_ratings(loader, actor_rating_df)
 
     # Process actor profit
-    process_actor_profit(loader, actor_profit_df)
+    actor_profit_df = process_actor_profit(loader, actor_profit_df)
 
     # Process TV shows ratings
-    process_tv_shows(loader, tv_df)
+    tv_df = process_tv_shows(loader, tv_df)
 
     # Get release dates and process music popularity
-    process_music_popularity(loader, process_release_dates(music_df))
+    music_df = process_music_popularity(loader, process_release_dates(music_df))
 
-    format_dates()
+    subjects = extract_subjects(tv_df, actor_profit_df, actor_rating_df, music_df)
+    news_df = process_news(loader, remove_duplicates(news_df), subjects)
+
+    format_dates(
+        actor_profit_df=actor_profit_df, news_df=news_df, music_df=music_df, tv_df=tv_df
+    )
 
 
 def process_release_dates(df):
@@ -71,31 +73,29 @@ def extract_subjects(tv_df, actor_profit_df, actor_rating_df, music_df):
 
 def process_news(loader, news_df, subjects):
     news_processor = NewsProcessor(subjects)
-    news_df = news_processor.process_headlines(
-        news_df=news_df, headlines=news_df["headline_text"]
-    )
-    subject_counts_df = news_processor.normalize_mentions(news_df)
-    loader.save_csv(subject_counts_df, "news.csv")
+    news_df = news_processor.process_headlines(news_df=news_df)
+    news_df = news_processor.normalize_mentions(news_df)
+    return news_df
 
 
 def process_actor_ratings(loader, actor_rating_df):
     actor_ratings_df = RatingsProcessor.process_actor_ratings(actor_rating_df)
-    loader.save_csv(actor_ratings_df, "actor_ratings.csv")
+    return actor_ratings_df
 
 
 def process_actor_profit(loader, actor_profit_df):
     actor_profit_df = RatingsProcessor.process_actor_profit(actor_profit_df)
-    loader.save_csv(actor_profit_df, "actor_profit.csv")
+    return actor_profit_df
 
 
 def process_tv_shows(loader, tv_df):
     tv_shows_df = RatingsProcessor.process_tv_shows(tv_df)
-    loader.save_csv(tv_shows_df, "tv.csv")
+    return tv_shows_df
 
 
 def process_music_popularity(loader, music_df):
     music_popularity_df = RatingsProcessor.process_music_popularity(music_df)
-    loader.save_csv(music_popularity_df, "music_popularity.csv")
+    return music_popularity_df
 
 
 def remove_duplicates(df):
@@ -103,13 +103,9 @@ def remove_duplicates(df):
     return df
 
 
-def format_dates():
+def format_dates(actor_profit_df, news_df, music_df, tv_df):
     # Load updated files
     loader = DataLoader(DATASET_PREFIX, DATASET_PREFIX)
-    actor_profit_df = loader.load_csv("actor_profit.csv")
-    news_df = loader.load_csv("news.csv")
-    music_df = loader.load_csv("music_popularity.csv")
-    tv_df = loader.load_csv("tv.csv")
 
     formatter = DateFormatter()
     actor_profit_df = formatter.format_actor_profit(actor_profit_df)
