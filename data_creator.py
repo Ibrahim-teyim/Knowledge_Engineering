@@ -3,12 +3,19 @@ from data_processing.date_formatter import DateFormatter
 from data_processing.music_release_date_fetcher import ReleaseDateFetcher
 from data_processing.news_processor import NewsProcessor
 from data_processing.rating_processor import RatingsProcessor
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access environment variables
+SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 
 
 TO_EDIT_PREFIX = "to_edit_data/"
 DATASET_PREFIX = "datasets/"
-SPOTIFY_CLIENT_ID = "1b30eb0f9d9b40dcbcb821b500ddddcd"
-SPOTIFY_CLIENT_SECRET = "e829686395f841eb8e7cea75d9035468"
 
 
 def create_data():

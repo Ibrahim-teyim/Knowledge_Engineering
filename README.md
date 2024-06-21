@@ -9,9 +9,18 @@ To create the environment you can run the following command:
 ```zsh
 conda create -n "<NAME_OF_THE_ENVIRONMENT>" python=3.10.14
 conda activate <NAME_OF_THE_ENVIRONMENT>
-``` 
+```
 
 *NOTE: replace <NAME_OF_THE_ENVIRONMENT> with your prefered env name.*
+
+Do not forget to add:
+
+```python
+SPOTIFY_CLIENT_ID = "<YOUR_CLIENT_ID>"
+SPOTIFY_CLIENT_SECRET = "<YOUR_CLIENT_SECRET>"
+```
+to a .env file to be able to run `data_creator.py`
+
 
 ### Installing the libraries
 

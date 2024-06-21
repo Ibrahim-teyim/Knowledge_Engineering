@@ -5,3 +5,4 @@ rdflib
 pandas
 numpy
 textblob
+python-dotenv
