@@ -16,10 +16,11 @@ conda activate <NAME_OF_THE_ENVIRONMENT>
 Do not forget to add:
 
 ```python
-SPOTIFY_CLIENT_ID = "<YOUR_CLIENT_ID>"
-SPOTIFY_CLIENT_SECRET = "<YOUR_CLIENT_SECRET>"
+SPOTIFY_CLIENT_ID="<YOUR_CLIENT_ID>"
+SPOTIFY_CLIENT_SECRET="<YOUR_CLIENT_SECRET>"
 ```
-to a .env file to be able to run `data_creator.py`
+to a .env file to be able to run `data_creator.py`.
+Followingly execute `source .env` command before you run the code.
 
 
 ### Installing the libraries
