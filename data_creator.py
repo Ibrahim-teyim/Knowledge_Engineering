@@ -22,7 +22,7 @@ def create_data():
     music_df = loader.load_csv("spotify.csv")
 
     # Process actor ratings
-    actor_rating_df = process_actor_ratings(loader, actor_rating_df)
+    actor_rating_df = process_actor_ratings(actor_rating_df)
 
     # Process actor profit
     actor_profit_df = process_actor_profit(loader, actor_profit_df)
@@ -34,7 +34,7 @@ def create_data():
     music_df = process_music_popularity(loader, process_release_dates(music_df))
 
     subjects = extract_subjects(tv_df, actor_profit_df, actor_rating_df, music_df)
-    news_df = process_news(loader, remove_duplicates(news_df), subjects)
+    news_df = process_news(remove_duplicates(news_df), subjects)
 
     format_dates(
         actor_profit_df=actor_profit_df, news_df=news_df, music_df=music_df, tv_df=tv_df
@@ -71,14 +71,14 @@ def extract_subjects(tv_df, actor_profit_df, actor_rating_df, music_df):
     )
 
 
-def process_news(loader, news_df, subjects):
+def process_news(news_df, subjects):
     news_processor = NewsProcessor(subjects)
     news_df = news_processor.process_headlines(news_df=news_df)
     news_df = news_processor.normalize_mentions(news_df)
     return news_df
 
 
-def process_actor_ratings(loader, actor_rating_df):
+def process_actor_ratings(actor_rating_df):
     actor_ratings_df = RatingsProcessor.process_actor_ratings(actor_rating_df)
     return actor_ratings_df
 
